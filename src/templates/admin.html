@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Админ-панель{% endblock %}
+{% block content %}
+<h1>Управление продуктами</h1>
+{% if error %}
+    <p class="error">{{ error }}</p>
+{% endif %}
+<table>
+    <tr>
+        <th>Название</th>
+        <th>Количество</th>
+        <th>Действия</th>
+    </tr>
+    {% for product in products %}
+    <tr>
+        <td>{{ product['name'] }}</td>
+        <td>{{ product['quantity'] }}</td>
+        <td>
+            <form method="POST" action="/products/update/{{ product['id'] }}">
+                <input type="number" name="quantity" min="0" required>
+                <button type="submit">Обновить</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

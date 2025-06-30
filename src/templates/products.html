@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Продукты{% endblock %}
+{% block content %}
+<div style="display: flex;">
+    <div style="flex: 3;">
+        <h1>Продукты</h1>
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+        <input type="text" id="searchInput" placeholder="Поиск по названию..." onkeyup="filterProducts()" style="width: 100%; padding: 5px; margin-bottom: 10px;">
+        <div style="max-height: 400px; overflow-y: auto; border: 1px solid #ccc;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr style="background: #f2f2f2;">
+                    <th style="padding: 10px; text-align: left;">Название</th>
+                    <th style="padding: 10px; text-align: left;">Количество</th>
+                    <th style="padding: 10px; text-align: left;">Действия</th>
+                </tr>
+                {% for product in products %}
+                <tr class="product-item" data-name="{{ product[1] }}">
+                    <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ product[1] }}">{{ product[1] }}</td>
+                    <td>{{ product[2] }}</td>
+                    <td>
+                        {% if user.role != 'admin' %}
+                        <form method="POST" action="/orders/add">
+                            <input type="hidden" name="product_id" value="{{ product[0] }}">
+                            <input type="number" name="quantity" min="1" max="{{ product[2] }}" required style="width: 60px;">
+                            <button type="submit" style="padding: 5px 10px; background: #4CAF50; color: white; border: none; border-radius: 3px;">Добавить</button>
+                        </form>
+                        {% else %}
+                        <p>Админ-доступ: действия с корзиной недоступны</p>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    {% if user.role != 'admin' %}
+    <div style="flex: 1; margin-left: 20px; background: #f9f9f9; padding: 20px; border-radius: 5px;">
+        <h2>Текущий заказ</h2>
+        {% if cart and cart.products %}
+            <ul style="list-style: none; padding: 0;">
+                {% for item in cart.products %}
+                    <li style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ item.product_name }}">{{ item.product_name }}</span>
+                        <span style="margin-left: 10px;">({{ item.quantity }})</span>
+                        <form method="POST" action="/orders/remove" style="display: inline;">
+                            <input type="hidden" name="product_id" value="{{ item.product_id }}">
+                            <button type="submit" style="padding: 3px 8px; background: #f44336; color: white; border: none; border-radius: 3px;">Удалить</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+            <form method="POST" action="/orders/create">
+                <input type="text" name="order_number" placeholder="Номер заказа" required style="width: 100%; padding: 5px; margin-bottom: 10px;">
+                <input type="text" name="account_number" placeholder="Номер счета (опционально)" style="width: 100%; padding: 5px; margin-bottom: 10px;">
+                <button type="submit" style="width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 3px;">Сформировать заказ</button>
+            </form>
+            <a href="/orders/clear" style="display: block; margin-top: 10px; text-align: center; color: #f44336;">Очистить корзину</a>
+        {% else %}
+            <p>Заказ пуст</p>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+<script>
+    function filterProducts() {
+        let input = document.getElementById("searchInput").value.toLowerCase();
+        let productItems = document.querySelectorAll(".product-item");
+        productItems.forEach(item => {
+            let name = item.getAttribute("data-name").toLowerCase();
+            item.style.display = name.includes(input) ? "table-row" : "none";
+        });
+    }
+</script>
+{% endblock %}

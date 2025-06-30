@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Подробности пользователя{% endblock %}
+{% block content %}
+<h1>Подробности пользователя: {{ user_details[1] }}</h1>
+<p><strong>ID:</strong> {{ user_details[0] }}</p>
+<p><strong>Роль:</strong> {{ user_details[2] }}</p>
+<p><strong>Дата создания:</strong> {{ user_details[3] }}</p>
+
+<h2>Текущая корзина</h2>
+{% if cart and cart.products %}
+    <ul style="list-style: none; padding: 0;">
+        {% for item in cart.products %}
+            <li style="margin-bottom: 10px;">
+                {{ item.product_name }} ({{ item.quantity }})
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Корзина пуста</p>
+{% endif %}
+
+<h2>Заказы пользователя</h2>
+{% if orders %}
+    <table>
+        <tr>
+            <th>Номер заказа</th>
+            <th>Номер счета</th>
+            <th>Дата создания</th>
+            <th>Товары</th>
+        </tr>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order['order_number'] }}</td>
+            <td>{{ order['account_number'] or "Не указан" }}</td>
+            <td>{{ order['created_at'] }}</td>
+            <td>
+                <ul>
+                    {% for product in order['order_products'] %}
+                        <li>{{ product.product_name }} ({{ product.quantity }})</li>
+                    {% endfor %}
+                </ul>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>Нет заказов</p>
+{% endif %}
+<a href="/users">Назад к списку пользователей</a>
+{% endblock %}

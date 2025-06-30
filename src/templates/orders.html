@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Заказы{% endblock %}
+{% block content %}
+<h1>Ваши заказы</h1>
+{% if orders %}
+    {% for order in orders %}
+        <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px;">
+            <h3>Заказ #{{ order.order_number }}</h3>
+            <p><strong>Номер счета:</strong> {{ order.account_number or "Не указан" }}</p>
+            <p><strong>Дата:</strong> {{ order.created_at }}</p>
+            <h4>Товары:</h4>
+            {% if order.order_products and order.order_products != [{}] %}
+                <ul>
+                    {% for item in order.order_products %}
+                        <li>{{ item["product_name"] }} ({{ item.quantity }}) </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Нет товаров</p>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% else %}
+    <p>У вас нет заказов</p>
+{% endif %}
+{% endblock %}
