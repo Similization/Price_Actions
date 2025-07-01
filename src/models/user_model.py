@@ -44,16 +44,20 @@ class User:
         async with get_db() as conn:
             query = "UPDATE users SET "
             params = []
+            param_index = 1
             if username:
-                query += "username = $1, "
+                query += f"username = ${param_index}, "
                 params.append(username)
+                param_index += 1
             if password:
-                query += "password = $2, "
+                query += f"password = ${param_index}, "
                 params.append(password)
+                param_index += 1
             if role:
-                query += "role = $3, "
+                query += f"role = ${param_index}, "
                 params.append(role)
-            query = query.rstrip(", ") + " WHERE id = $4 RETURNING *"
+                param_index += 1
+            query = query.rstrip(", ") + f" WHERE id = ${param_index} RETURNING *"
             params.append(user_id)
             try:
                 row = await conn.fetchrow(query, *params)

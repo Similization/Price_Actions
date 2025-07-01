@@ -7,11 +7,13 @@
         <p class="error">{{ error }}</p>
     {% endif %}
     <input type="text" id="searchInput" placeholder="Поиск по названию..." onkeyup="filterProducts()" style="width: -webkit-fill-available; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ddd;">
-    <div class="scrollable">
+
+    <div class="product-layout">
+    <div class="scrollable product-table">
     <table>
         <thead>
             <tr>
-                <th>Название</th>
+                <th class="width-600">Название</th>
                 <th>Количество</th>
                 <th>Действия</th>
             </tr>
@@ -19,7 +21,7 @@
         <tbody>
             {% for product in products %}
             <tr class="product-item" data-name="{{ product[1] }}">
-                <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ product[1] }}">{{ product[1] }}</td>
+                <td class="long-column-fix" title="{{ product[1] }}">{{ product[1] }}</td>
                 <td>{{ product[2] }}</td>
                 <td>
                     {% if user.role != 'admin' %}
@@ -37,30 +39,31 @@
         </tbody>
     </table>
     </div>
+
     {% if user.role != 'admin' %}
-    <div style="margin-top: 20px; background: #f9f9f9; padding: 20px; border-radius: 5px;">
+    <div class="cart-panel">
         <h2>Текущий заказ</h2>
         {% if cart and cart.products %}
-            <ul style="list-style: none; padding: 0;">
-                {% for item in cart.products %}
-                    <li style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-                        <span style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ item.product_name }}">{{ item.product_name }}</span>
-                        <span style="margin-left: 10px;">({{ item.quantity }})</span>
-                        <form method="POST" action="/orders/remove" style="display: inline;">
-                            <input type="hidden" name="product_id" value="{{ item.product_id }}">
-                            <button type="submit">Удалить</button>
-                        </form>
-                    </li>
-                {% endfor %}
-            </ul>
-            <form method="POST" action="/orders/create">
-                <input type="text" name="order_number" placeholder="Номер заказа" required>
-                <input type="text" name="account_number" placeholder="Номер счета (опционально)">
-                <button type="submit">Сформировать заказ</button>
+        <ul>
+            {% for item in cart.products %}
+            <li>
+            <span class="width-200" title="{{ item.product_name }}">{{ item.product_name }}</span>
+            <span>({{ item.quantity }})</span>
+            <form method="POST" action="/orders/remove">
+                <input type="hidden" name="product_id" value="{{ item.product_id }}">
+                <button type="submit">Удалить</button>
             </form>
-            <a href="/orders/clear" style="display: block; margin-top: 10px; text-align: center; color: #e74c3c;">Очистить корзину</a>
+            </li>
+            {% endfor %}
+        </ul>
+        <form method="POST" action="/orders/create">
+            <input type="text" name="order_number" placeholder="Номер заказа" required>
+            <input type="text" name="account_number" placeholder="Номер счета (опционально)">
+            <button type="submit">Сформировать заказ</button>
+        </form>
+        <a href="/orders/clear" class="cart-clear">Очистить корзину</a>
         {% else %}
-            <p>Заказ пуст</p>
+        <p>Заказ пуст</p>
         {% endif %}
     </div>
     {% endif %}
@@ -75,4 +78,4 @@
         });
     }
 </script>
-{% endblock %}
+{% endblock %}    

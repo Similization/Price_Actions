@@ -23,49 +23,89 @@
     {% endif %} -->
 
     <h2>Заказы пользователя</h2>
-    <div class="scrollable">
-        <table>
-            <thead>
-                <tr>
-                    <th>Номер заказа</th>
-                    <th>Номер счета</th>
-                    <th>Дата создания</th>
-                    <th>Товары</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for order in orders %}
-                <tr>
-                    <td>{{ order['order_number'] }}</td>
-                    <td>{{ order['account_number'] or "Не указан" }}</td>
-                    <td>{{ order['created_at'] }}</td>
-                    <td>
-                        <table>
-                            <tr>
-                                <th>Наименование</th>
-                                <th>Количество</th>
-                            </tr>
-                            {% for product in order['order_products'] if order['order_products'] and order['order_products'] != [{}] %}
-                            <tr>
-                                <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ product.product_name }}">{{ product.product_name }}</td>
-                                <td>{{ product.quantity }} шт.</td>
-                            </tr>
-                            {% endfor %}
-                            {% if not order['order_products'] or order['order_products'] == [{}] %}
-                                <tr><td colspan="2">Нет товаров</td></tr>
-                            {% endif %}
-                        </table>
-                    </td>
-                </tr>
-                {% endfor %}
-                {% if not orders %}
-                    <tr><td colspan="4">Нет заказов</td></tr>
-                {% endif %}
-            </tbody>
-        </table>
+    <div style="margin-bottom: 15px;">
+        <button class="btn-details active" onclick="showTab('orders')">Все заказы</button>
+        <button class="btn-details" onclick="showTab('summary')">Сводка</button>
+    </div>
+
+    <div id="orders-tab" class="tab-content">
+        <h2>Заказы пользователя</h2>
+        <div class="scrollable">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Номер заказа</th>
+                            <th>Номер счета</th>
+                            <th>Дата создания</th>
+                            <th>Товары</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>{{ order['order_number'] }}</td>
+                            <td>{{ order['account_number'] or "Не указан" }}</td>
+                            <td>{{ order['created_at'] }}</td>
+                            <td class="no-padding no-border">
+                                <table class="table-in-table">
+                                    <tr>
+                                        <th>Наименование</th>
+                                        <th>Количество</th>
+                                    </tr>
+                                    {% for product in order['order_products'] if order['order_products'] and order['order_products'] != [{}] %}
+                                    <tr>
+                                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ product.product_name }}">{{ product.product_name }}</td>
+                                        <td>{{ product.quantity }} шт.</td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% if not order['order_products'] or order['order_products'] == [{}] %}
+                                        <tr><td colspan="2">Нет товаров</td></tr>
+                                    {% endif %}
+                                </table>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% if not orders %}
+                            <tr><td colspan="4">Нет заказов</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+        </div>
+    </div>
+    <div id="summary-tab" class="tab-content" style="display: none;">
+        <h2>Сводка по заказам</h2>
+        <div class="scrollable">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Наименование</th>
+                        <th style="width: 200px;">Общее количество</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for key, val in products.items() %}
+                    <tr>
+                        <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ key }}">{{ key }}</td>
+                        <td>{{ val }} шт.</td>
+                    </tr>
+                    {% endfor %}
+                    {% if not products %}
+                        <tr><td colspan="2">Нет данных</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="user-bottom-button">
         <a href="/users" class="btn-details">Назад к списку пользователей</a>
     </div>
 </div>
+<script>
+function showTab(tab) {
+    document.getElementById("orders-tab").style.display = tab === "orders" ? "block" : "none";
+    document.getElementById("summary-tab").style.display = tab === "summary" ? "block" : "none";
+    document.querySelectorAll(".btn-details").forEach(btn => btn.classList.remove("active"));
+    event.target.classList.add("active");
+}
+</script>
 {% endblock %}

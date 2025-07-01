@@ -5,18 +5,16 @@ from src.controllers.user_controller import (
     get_all_users,
     create_user,
     update_user,
-    get_user_details,
-    clear_and_reset_users,
-    bulk_create_users,
+    get_user_details
 )
 from src.controllers.product_controller import (
     clear_and_reset_products,
     bulk_create_products,
 )
 from src.controllers.product_controller import clear_and_reset_products, get_all
-from src.controllers.order_controller import clear_and_reset_orders, bulk_create_orders
+from src.controllers.order_controller import clear_and_reset_orders
 from src.middleware.auth_middleware import auth_middleware
-import csv
+from src.utils.data_changer import calculate_product_count
 
 router = APIRouter()
 templates = Jinja2Templates(directory="src/templates")
@@ -107,6 +105,7 @@ async def get_user_details_route(
         )
     try:
         details = await get_user_details(id)
+        products = calculate_product_count(orders=details["orders"])
         cart = request.session.get(f"cart_{id}", {"products": []})
         if not isinstance(cart.get("products"), list):
             cart = {"products": []}
@@ -116,6 +115,7 @@ async def get_user_details_route(
                 "request": request,
                 "user_details": details["user"],
                 "orders": details["orders"],
+                "products": products,
                 "cart": cart,
                 "user": user,
             },

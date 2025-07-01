@@ -37,16 +37,32 @@
                     <td>{{ user['username'] }}</td>
                     <td>{{ user['role'] }}</td>
                     <td>{{ user['created_at'] }}</td>
-                    <td class="actions td-inside" style="max-width: 200px;">
+                    <td class="actions">
                         <a href="/users/{{ user['id'] }}/details" class="btn-details">Подробности</a>
-                        <form method="POST" action="/users/update/{{ user['id'] }}" class="form-update">
-                            <input type="text" name="username" placeholder="Новое имя" class="small">
-                            <input type="password" name="password" placeholder="Новый пароль" class="small">
-                            <select name="role" class="small">
-                                <option value="user">Пользователь</option>
-                                <option value="admin">Администратор</option>
-                            </select>
-                            <button type="submit">Обновить</button>
+                        <button type="button" onclick="toggleEditForm({{ user['id'] }})" class="btn-details">Изменить</button>
+                    </td>
+                </tr>
+
+                <!-- Форма редактирования -->
+                <tr class="edit-row" id="edit-row-{{ user['id'] }}" style="display: none;">
+                    <td colspan="5">
+                        <form method="POST" action="/users/update/{{ user['id'] }}" class="edit-form">
+                            <label>Логин:
+                                <input type="text" name="username" value="{{ user['username'] }}" required>
+                            </label>
+                            <label>Пароль:
+                                <input type="password" name="password" placeholder="Новый пароль">
+                            </label>
+                            <label>Роль:
+                                <select name="role">
+                                    <option value="user" {% if user['role'] == 'user' %}selected{% endif %}>Пользователь</option>
+                                    <option value="admin" {% if user['role'] == 'admin' %}selected{% endif %}>Администратор</option>
+                                </select>
+                            </label>
+                            <div class="edit-actions">
+                                <button type="submit">Сохранить</button>
+                                <button type="button" onclick="toggleEditForm({{ user['id'] }})" class="cancel-btn">Отмена</button>
+                            </div>
                         </form>
                     </td>
                 </tr>
@@ -63,6 +79,10 @@
             let name = item.getAttribute("data-name").toLowerCase();
             item.style.display = name.includes(input) ? "table-row" : "none";
         });
+    }
+    function toggleEditForm(id) {
+        const row = document.getElementById(`edit-row-${id}`);
+        row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
     }
 </script>
 {% endblock %}
