@@ -3,22 +3,26 @@ body {
     margin: 0;
     padding: 20px;
     background-color: #f4f4f9;
+    color: #333;
 }
 
 h1, h2 {
-    color: #333;
+    margin-bottom: 10px;
+    margin-top: 10px;
 }
 
 nav {
     background-color: #007bff;
     padding: 10px;
     margin-bottom: 20px;
+    border-radius: 5px;
 }
 
 nav a {
-    color: white;
+    color: #fff;
     margin-right: 15px;
     text-decoration: none;
+    font-weight: bold;
 }
 
 nav a:hover {
@@ -26,12 +30,35 @@ nav a:hover {
 }
 
 .container {
-    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    height: 80vh;
+
+    max-width: 1200px;
+    width: 100%;
     margin: 0 auto;
-    background: white;
+    background: #fff;
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.form-container {
+    max-width: 400px;
+    width: 100%;
+    margin: 0 auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.form-create {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 form {
@@ -40,39 +67,27 @@ form {
     gap: 10px;
 }
 
-.form-create {
-    margin: 20px 0;
-}
-
-.form-update {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    margin: 10px 0;
-}
-
-input, button {
+input, button, select {
     padding: 10px;
     font-size: 16px;
+    border-radius: 5px;
 }
 
 input {
     border: 1px solid #ddd;
-    border-radius: 5px;
 }
 
-input.small {
-    width: 120px;
+input.small, select.small {
+    width: auto;
     padding: 5px;
     font-size: 14px;
 }
 
 button {
     background-color: #007bff;
-    color: white;
+    color: #fff;
     border: none;
     cursor: pointer;
-    border-radius: 5px;
 }
 
 button:hover {
@@ -81,10 +96,12 @@ button:hover {
 
 table {
     width: 100%;
-    border-collapse: collapse;
+    border-spacing: 0; /* убирает зазор */
     margin-top: 20px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-collapse: separate; /* ключевое отличие */
 }
+
 
 th, td {
     border: 1px solid #ddd;
@@ -110,7 +127,7 @@ tr:hover {
     display: inline-block;
     padding: 8px 15px;
     background-color: #007bff;
-    color: white;
+    color: #fff;
     text-decoration: none;
     border-radius: 5px;
     text-align: center;
@@ -121,6 +138,53 @@ tr:hover {
 }
 
 .error {
-    color: red;
+    color: #e74c3c;
     font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.scrollable {
+    position: relative;
+    overflow-y: auto;
+    border: none;
+}
+
+/* Всегда видимая нижняя граница */
+.scrollable::after {
+    content: "";
+    position: sticky;
+    bottom: 0;
+    display: block;
+    height: 1px;
+    width: 100%;
+    background-color: #ddd;
+    z-index: 5;
+}
+
+.scrollable thead th {
+    position: sticky;
+    top: 0;
+    background-color: #f2f2f2;
+    z-index: 2;
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1); /* сглаживает переход */
+}
+
+.user-details-inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    color: #444;
+}
+
+.user-details-inline span {
+    white-space: nowrap;
+}
+
+.user-bottom-button {
+    margin-top: auto;         /* Прижмет к низу .container */
+    padding-top: 10px;        /* Отступ от таблицы */
+    align-self: flex-start;   /* Выровнено по левому краю */
+    width: fit-content;       /* Узкая кнопка по тексту */
 }

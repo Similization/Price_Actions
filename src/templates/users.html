@@ -8,48 +8,61 @@
     {% endif %}
     <h2>Создать нового пользователя</h2>
     <form method="POST" action="/users/create" class="form-create">
-        <input type="text" name="username" placeholder="Имя пользователя" required class="input-field">
-        <input type="password" name="password" placeholder="Пароль" required class="input-field">
-        <select name="role" class="input-field">
+        <input type="text" name="username" placeholder="Имя пользователя" required>
+        <input type="password" name="password" placeholder="Пароль" required>
+        <select name="role">
             <option value="user">Пользователь</option>
             <option value="admin">Администратор</option>
         </select>
-        <button type="submit" class="btn">Создать</button>
+        <button type="submit">Создать</button>
     </form>
 
     <h2>Список пользователей</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Имя пользователя</th>
-                <th>Роль</th>
-                <th>Дата создания</th>
-                <th>Действия</th>
-            </tr>
-        </thead>    
-        <tbody>
-            {% for user in users %}
-            <tr>
-                <td>{{ user['id'] }}</td>
-                <td>{{ user['username'] }}</td>
-                <td>{{ user['role'] }}</td>
-                <td>{{ user['created_at'] }}</td>
-                <td class="actions">
-                    <a href="/users/{{ user['id'] }}/details" class="btn-details">Подробности</a>
-                    <form method="POST" action="/users/update/{{ user['id'] }}" class="form-update">
-                        <input type="text" name="username" placeholder="Новое имя" class="input-field small">
-                        <input type="password" name="password" placeholder="Новый пароль" class="input-field small">
-                        <select name="role" class="input-field small">
-                            <option value="user">Пользователь</option>
-                            <option value="admin">Администратор</option>
-                        </select>
-                        <button type="submit" class="btn">Обновить</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <input type="text" id="searchInput" placeholder="Поиск по логину..." onkeyup="filterUsers()" style="width: -webkit-fill-available; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ddd;">
+    <div class="scrollable">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Имя пользователя</th>
+                    <th>Роль</th>
+                    <th>Дата создания</th>
+                    <th style="width: 200px;">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr class="user-item" data-name="{{ user.username }}">
+                    <td>{{ user['id'] }}</td>
+                    <td>{{ user['username'] }}</td>
+                    <td>{{ user['role'] }}</td>
+                    <td>{{ user['created_at'] }}</td>
+                    <td class="actions td-inside" style="max-width: 200px;">
+                        <a href="/users/{{ user['id'] }}/details" class="btn-details">Подробности</a>
+                        <form method="POST" action="/users/update/{{ user['id'] }}" class="form-update">
+                            <input type="text" name="username" placeholder="Новое имя" class="small">
+                            <input type="password" name="password" placeholder="Новый пароль" class="small">
+                            <select name="role" class="small">
+                                <option value="user">Пользователь</option>
+                                <option value="admin">Администратор</option>
+                            </select>
+                            <button type="submit">Обновить</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
+<script>
+    function filterUsers() {
+        let input = document.getElementById("searchInput").value.toLowerCase();
+        let userItems = document.querySelectorAll(".user-item");
+        userItems.forEach(item => {
+            let name = item.getAttribute("data-name").toLowerCase();
+            item.style.display = name.includes(input) ? "table-row" : "none";
+        });
+    }
+</script>
 {% endblock %}

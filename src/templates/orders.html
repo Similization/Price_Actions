@@ -1,26 +1,58 @@
 {% extends "base.html" %}
 {% block title %}Заказы{% endblock %}
 {% block content %}
-<h1>Ваши заказы</h1>
-{% if orders %}
-    {% for order in orders %}
-        <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px;">
-            <h3>Заказ #{{ order.order_number }}</h3>
-            <p><strong>Номер счета:</strong> {{ order.account_number or "Не указан" }}</p>
-            <p><strong>Дата:</strong> {{ order.created_at }}</p>
-            <h4>Товары:</h4>
-            {% if order.order_products and order.order_products != [{}] %}
-                <ul>
-                    {% for item in order.order_products %}
-                        <li>{{ item["product_name"] }} ({{ item.quantity }}) </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>Нет товаров</p>
+<div class="container">
+    <h1>Ваши заказы</h1>
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+    <input type="text" id="searchInput" placeholder="Поиск по номеру заказа..." onkeyup="filterOrders()" style="width: -webkit-fill-available; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ddd;">
+    <div class="scrollable">
+        <table>
+            <tr>
+                <th>Номер заказа</th>
+                <th>Номер счета</th>
+                <th>Дата</th>
+                <th>Товары</th>
+            </tr>
+            {% for order in orders %}
+            <tr class="order-item" data-name="{{ order.order_number }}">
+                <td>{{ order.order_number }}</td>
+                <td>{{ order.account_number or "Не указан" }}</td>
+                <td>{{ order.created_at }}</td>
+                <td>
+                    <table>
+                        <tr>
+                            <th>Наименование</th>
+                            <th>Количество</th>
+                        </tr>
+                        {% for item in order.order_products if order.order_products and order.order_products != [{}] %}
+                        <tr>
+                            <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ item.product_name }}">{{ item.product_name }}</td>
+                            <td>{{ item.quantity }} шт.</td>
+                        </tr>
+                        {% endfor %}
+                        {% if not order.order_products or order.order_products == [{}] %}
+                            <tr><td colspan="2">Нет товаров</td></tr>
+                        {% endif %}
+                    </table>
+                </td>
+            </tr>
+            {% endfor %}
+            {% if not orders %}
+                <tr><td colspan="4">У вас нет заказов</td></tr>
             {% endif %}
-        </div>
-    {% endfor %}
-{% else %}
-    <p>У вас нет заказов</p>
-{% endif %}
+        </table>
+    </div>
+</div>
+<script>
+    function filterOrders() {
+        let input = document.getElementById("searchInput").value.toLowerCase();
+        let orderItems = document.querySelectorAll(".order-item");
+        orderItems.forEach(item => {
+            let name = item.getAttribute("data-name").toLowerCase();
+            item.style.display = name.includes(input) ? "table-row" : "none";
+        });
+    }
+</script>
 {% endblock %}

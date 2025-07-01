@@ -1,50 +1,71 @@
 {% extends "base.html" %}
 {% block title %}Подробности пользователя{% endblock %}
 {% block content %}
-<h1>Подробности пользователя: {{ user_details[1] }}</h1>
-<p><strong>ID:</strong> {{ user_details[0] }}</p>
-<p><strong>Роль:</strong> {{ user_details[2] }}</p>
-<p><strong>Дата создания:</strong> {{ user_details[3] }}</p>
+<div class="container">
+    <h1>Подробности пользователя: {{ user_details[1] }}</h1>
+    <div class="user-details-inline">
+        <span><strong>ID:</strong> {{ user_details['id'] }}</span>
+        <span><strong>Роль:</strong> {{ user_details['role'] }}</span>
+        <span><strong>Дата создания:</strong> {{ user_details['created_at'] }}</span>
+    </div>
 
-<h2>Текущая корзина</h2>
-{% if cart and cart.products %}
-    <ul style="list-style: none; padding: 0;">
-        {% for item in cart.products %}
-            <li style="margin-bottom: 10px;">
-                {{ item.product_name }} ({{ item.quantity }})
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>Корзина пуста</p>
-{% endif %}
+    <!-- <h2>Текущая корзина</h2>
+    {% if cart and cart.products %}
+        <ul style="list-style: none; padding: 0;">
+            {% for item in cart.products %}
+                <li style="margin-bottom: 10px;">
+                    {{ item.product_name }} ({{ item.quantity }})
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Корзина пуста</p>
+    {% endif %} -->
 
-<h2>Заказы пользователя</h2>
-{% if orders %}
-    <table>
-        <tr>
-            <th>Номер заказа</th>
-            <th>Номер счета</th>
-            <th>Дата создания</th>
-            <th>Товары</th>
-        </tr>
-        {% for order in orders %}
-        <tr>
-            <td>{{ order['order_number'] }}</td>
-            <td>{{ order['account_number'] or "Не указан" }}</td>
-            <td>{{ order['created_at'] }}</td>
-            <td>
-                <ul>
-                    {% for product in order['order_products'] %}
-                        <li>{{ product.product_name }} ({{ product.quantity }})</li>
-                    {% endfor %}
-                </ul>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-{% else %}
-    <p>Нет заказов</p>
-{% endif %}
-<a href="/users">Назад к списку пользователей</a>
+    <h2>Заказы пользователя</h2>
+    <div class="scrollable">
+        <table>
+            <thead>
+                <tr>
+                    <th>Номер заказа</th>
+                    <th>Номер счета</th>
+                    <th>Дата создания</th>
+                    <th>Товары</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order['order_number'] }}</td>
+                    <td>{{ order['account_number'] or "Не указан" }}</td>
+                    <td>{{ order['created_at'] }}</td>
+                    <td>
+                        <table>
+                            <tr>
+                                <th>Наименование</th>
+                                <th>Количество</th>
+                            </tr>
+                            {% for product in order['order_products'] if order['order_products'] and order['order_products'] != [{}] %}
+                            <tr>
+                                <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ product.product_name }}">{{ product.product_name }}</td>
+                                <td>{{ product.quantity }} шт.</td>
+                            </tr>
+                            {% endfor %}
+                            {% if not order['order_products'] or order['order_products'] == [{}] %}
+                                <tr><td colspan="2">Нет товаров</td></tr>
+                            {% endif %}
+                        </table>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% if not orders %}
+                    <tr><td colspan="4">Нет заказов</td></tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <div class="user-bottom-button">
+        <a href="/users" class="btn-details">Назад к списку пользователей</a>
+    </div>
+</div>
 {% endblock %}

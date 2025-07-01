@@ -1,27 +1,46 @@
 {% extends "base.html" %}
 {% block title %}Админ-панель{% endblock %}
 {% block content %}
-<h1>Управление продуктами</h1>
-{% if error %}
-    <p class="error">{{ error }}</p>
-{% endif %}
-<table>
-    <tr>
-        <th>Название</th>
-        <th>Количество</th>
-        <th>Действия</th>
-    </tr>
-    {% for product in products %}
-    <tr>
-        <td>{{ product['name'] }}</td>
-        <td>{{ product['quantity'] }}</td>
-        <td>
-            <form method="POST" action="/products/update/{{ product['id'] }}">
-                <input type="number" name="quantity" min="0" required>
-                <button type="submit">Обновить</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+<div class="container">
+    <h1>Управление продуктами</h1>
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+    <input type="text" id="searchInput" placeholder="Поиск по названию..." onkeyup="filterProducts()" style="width: -webkit-fill-available; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ddd;">
+    <div class="scrollable">
+        <table>
+            <thead>
+                <tr>
+                    <th>Название</th>
+                    <th>Количество</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr class="product-item" data-name="{{ product['name'] }}">
+                    <td>{{ product['name'] }}</td>
+                    <td>{{ product['quantity'] }}</td>
+                    <td>
+                        <form method="POST" action="/products/update/{{ product['id'] }}">
+                            <input type="number" name="quantity" min="0" required class="small">
+                            <button type="submit">Обновить</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    function filterProducts() {
+        let input = document.getElementById("searchInput").value.toLowerCase();
+        let productItems = document.querySelectorAll(".product-item");
+        productItems.forEach(item => {
+            let name = item.getAttribute("data-name").toLowerCase();
+            item.style.display = name.includes(input) ? "table-row" : "none";
+        });
+    }
+</script>
 {% endblock %}

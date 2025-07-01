@@ -4,11 +4,12 @@ from src.models.order_model import Order
 from argon2 import PasswordHasher
 from jose import jwt
 from src.utils.config import load_config
+from src.utils.data_changer import change_data
 import asyncio
+from datetime import datetime
 
 config = load_config()
 ph = PasswordHasher()
-
 
 async def register(username: str, password: str):
     if not username or not password:
@@ -32,7 +33,6 @@ async def register(username: str, password: str):
     )
     return {"token": token, "user": user_structure}
 
-
 async def login(username: str, password: str):
     user = await User.find_by_username(username)
     if not user:
@@ -49,10 +49,12 @@ async def login(username: str, password: str):
     )
     return {"token": token, "user": user_structure}
 
-
 async def get_all_users():
-    return await User.get_all()
-
+    users = await User.get_all()
+    # Форматируем дату
+    for user in users:
+        user['created_at'] = change_data(user['created_at'])
+    return users
 
 async def create_user(username: str, password: str, role: str = "user"):
     if not username or not password:
@@ -61,7 +63,6 @@ async def create_user(username: str, password: str, role: str = "user"):
         )
     hashed_password = ph.hash(password)
     return await User.create(username, hashed_password, role)
-
 
 async def update_user(
     user_id: int, username: str = None, password: str = None, role: str = None
@@ -76,18 +77,19 @@ async def update_user(
         raise HTTPException(status_code=404, detail="Пользователь не найден")
     return user
 
-
 async def get_user_details(user_id: int):
     user = await User.find_by_id(user_id)
     if not user:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
     orders = await Order.get_by_user(user_id)
+    # Форматируем даты
+    user['created_at'] = change_data(user['created_at'])
+    for order in orders:
+        order['created_at'] = change_data(order['created_at'])
     return {"user": user, "orders": orders}
-
 
 async def clear_and_reset_users():
     await User.clear_and_reset()
-
 
 async def bulk_create_users(csv_data):
     sem = asyncio.Semaphore(5)
